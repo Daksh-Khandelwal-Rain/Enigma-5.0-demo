@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ENIGMA 5.0 — Wire the Circuit</title>
+<meta name="description" content="Enigma 5.0 — Flagship Hackathon of SIES CSI. Sit at the station. Wire the circuit. Send the transmission." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<script src="assets/js/main.js"></script>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link rel="stylesheet" href="assets/css/styles.css" />
+</head>
+<body class="bg-void font-body antialiased">
+
+<a href="#main" class="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[200] focus:bg-brass focus:text-void focus:px-4 focus:py-2 focus:rounded-md focus:font-mono focus:text-sm">Skip to content</a>
+
+<div id="power-flash" aria-hidden="true"></div>
+
+<!-- ================= THE MACHINE (assembles quietly as you scroll — never draws attention to itself) ================= -->
+<div id="machine-build" aria-hidden="true">
+  <svg viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice">
+    <!-- table edge -->
+    <line class="part" data-part="0" x1="0" y1="82" x2="100" y2="82" stroke="rgba(184,137,76,0.10)" stroke-width="0.15"/>
+    <!-- chassis outline -->
+    <rect class="part" data-part="1" x="30" y="55" width="40" height="22" rx="1.2" fill="none" stroke="rgba(184,137,76,0.14)" stroke-width="0.18"/>
+    <!-- plugboard grid -->
+    <g class="part" data-part="2">
+      <rect x="34" y="59" width="32" height="10" rx="0.6" fill="none" stroke="rgba(184,137,76,0.16)" stroke-width="0.12"/>
+    </g>
+    <!-- rotors -->
+    <g class="part" data-part="3">
+      <circle cx="42" cy="63.5" r="2.6" fill="none" stroke="rgba(184,137,76,0.18)" stroke-width="0.14"/>
+      <circle cx="50" cy="63.5" r="2.6" fill="none" stroke="rgba(184,137,76,0.18)" stroke-width="0.14"/>
+      <circle cx="58" cy="63.5" r="2.6" fill="none" stroke="rgba(184,137,76,0.18)" stroke-width="0.14"/>
+    </g>
+    <!-- indicator lamps -->
+    <g class="part" data-part="4">
+      <circle cx="37" cy="72" r="0.5" fill="rgba(143,209,79,0.35)"/>
+      <circle cx="41" cy="72" r="0.5" fill="rgba(143,209,79,0.2)"/>
+      <circle cx="45" cy="72" r="0.5" fill="rgba(143,209,79,0.2)"/>
+      <circle cx="55" cy="72" r="0.5" fill="rgba(143,209,79,0.2)"/>
+      <circle cx="59" cy="72" r="0.5" fill="rgba(143,209,79,0.2)"/>
+      <circle cx="63" cy="72" r="0.5" fill="rgba(143,209,79,0.35)"/>
+    </g>
+    <!-- final machine glow -->
+    <rect class="part" data-part="5" x="30" y="55" width="40" height="22" rx="1.2" fill="none" stroke="rgba(143,209,79,0.14)" stroke-width="0.3"/>
+  </svg>
+</div>
+
+<!-- ================= TRANSMISSION INTRO ================= -->
+<div id="intro" aria-hidden="true">
+  <div class="intro-inner">
+    <div id="intro-sub">OPERATOR STATION · STANDBY</div>
+    <div id="intro-text">&nbsp;</div>
+    <div id="intro-caption">This station goes live when a circuit closes.<br>Connect S to T to begin the transmission.</div>
+
+    <div class="mini-jacks mt-8" id="intro-jacks">
+      <svg id="mini-cable-svg" viewBox="0 0 200 58" preserveAspectRatio="none"><path id="mini-cable-path" d="" stroke="#8FD14F" stroke-width="2" fill="none" stroke-linecap="round" opacity="0"/></svg>
+      <button type="button" class="mini-jack" data-mini-letter="S" aria-label="Jack S">S</button>
+      <button type="button" class="mini-jack" data-mini-letter="T" aria-label="Jack T">T</button>
+    </div>
+
+    <button id="skip-intro" class="skip-btn" type="button">Connect automatically</button>
+  </div>
+</div>
+
+<!-- ================= TOP BAR ================= -->
+<nav id="topbar" class="fixed top-0 inset-x-0 z-50">
+  <div class="max-w-7xl mx-auto px-6 lg:px-10 h-20 flex items-center justify-between">
+    <a href="#main" class="relative flex items-center gap-3">
+      <span class="font-display font-bold tracking-wide text-off text-lg sm:text-xl" style="color:#E7E3D8;">ENIGMA <span class="text-brass">5.0</span></span>
+    </a>
+    <button data-open-drawer class="btn-primary text-xs sm:text-sm px-4 sm:px-5 py-2.5 rounded-lg">Accept the Mission</button>
+  </div>
+</nav>
+
+<main id="main">
+
+<!-- ================= DISCOVERY (interact: intro plugboard already closed the first circuit) ================= -->
+<section data-milestone="discovery" class="relative min-h-screen flex items-center overflow-hidden pt-20">
+  <canvas id="particles" class="opacity-50"></canvas>
+  <div class="blueprint" id="bp-1"></div>
+  <div class="annotations" aria-hidden="true">
+    <span style="top:18%; left:8%;">CIRCUIT 04.2</span>
+    <span style="top:72%; left:12%;">STECKER Ø34</span>
+    <span style="top:26%; right:9%;">LAT 19.07N</span>
+    <span style="top:64%; right:6%;">WIRE // 5.0 · S/N 0819</span>
+    <span style="top:44%; left:4%; opacity:.4;">INSPECTED — OK</span>
+  </div>
+  <div class="grain"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-void pointer-events-none"></div>
+
+  <div class="relative max-w-5xl mx-auto px-6 lg:px-10 text-center">
+    <p class="eyebrow reveal">OPERATOR STATION · SIES CSI</p>
+    <h1 class="reveal reveal-delay-1 font-display font-bold text-off leading-[0.98] mt-6 text-[clamp(2.4rem,7vw,5rem)] tracking-tight" style="color:#E7E3D8;">
+      SOME PROBLEMS DON'T GET SOLVED.<br class="hidden sm:block"> THEY GET <span class="text-brass">WIRED THROUGH</span>.
+    </h1>
+    <p class="reveal reveal-delay-2 font-mono text-mute text-sm sm:text-base tracking-[0.1em] mt-6">ENIGMA 5.0 — FLAGSHIP HACKATHON OF SIES CSI</p>
+    <p class="reveal reveal-delay-3 text-mute max-w-xl mx-auto mt-6 text-base sm:text-lg leading-relaxed">
+      One circuit's closed. Two dossiers wait below — wire either to open it.
+    </p>
+    <div class="reveal reveal-delay-4 flex flex-col sm:flex-row items-center justify-center gap-4 mt-10">
+      <button data-open-drawer class="btn-primary px-8 py-3.5 rounded-lg text-sm">Accept the Mission</button>
+      <a href="#history" class="btn-outline px-8 py-3.5 rounded-lg text-sm">Keep Reading</a>
+    </div>
+  </div>
+
+  <div class="scroll-cue absolute bottom-9 left-1/2 -translate-x-1/2 text-mute">
+    <svg width="18" height="28" viewBox="0 0 18 28" fill="none"><rect x="1" y="1" width="16" height="26" rx="8" stroke="currentColor" stroke-width="1.2"/><circle cx="9" cy="8" r="2" fill="currentColor"/></svg>
+  </div>
+</section>
+
+<!-- ================= WHAT WAS ENIGMA? (observe — illustration replaces most of the paragraph) ================= -->
+<section id="history" data-milestone="history" class="relative py-28 sm:py-36 px-6 border-t border-white/5 overflow-hidden">
+  <div class="blueprint opacity-60"></div>
+  <div class="relative max-w-3xl mx-auto">
+    <div class="text-center mb-10">
+      <p class="eyebrow reveal">WHAT WAS ENIGMA?</p>
+    </div>
+
+    <div class="reveal reveal-delay-1 flex justify-center mb-8">
+      <svg id="plugboard-sketch" width="280" height="140" viewBox="0 0 280 140" aria-hidden="true">
+        <rect x="10" y="10" width="260" height="120" rx="4" class="sketch-line" stroke-dasharray="3 3" opacity="0.4"/>
+        <text x="20" y="26" class="sketch-label">STECKERBRETT — FRONT PANEL</text>
+        <g id="sketch-jacks"></g>
+        <path class="sketch-line diagram-draw" id="sketch-cable-1" d="M 45 90 Q 90 60 135 90" />
+        <path class="sketch-line diagram-draw" id="sketch-cable-2" d="M 165 90 Q 200 130 235 90" />
+        <text x="20" y="122" class="sketch-label">26 JACKS · REWIRED DAILY</text>
+      </svg>
+    </div>
+
+    <div class="paper reveal reveal-delay-2 p-8 sm:p-12">
+      <div class="flex items-center justify-between mb-7">
+        <span class="font-mono text-[11px] tracking-[0.2em] opacity-50">RECORD — 1918</span>
+        <span class="paper-stamp">DECLASSIFYING</span>
+      </div>
+      <p id="history-text" class="font-display text-[clamp(1.1rem,2.4vw,1.4rem)] leading-relaxed font-semibold">
+        The machine's real trick wasn't the rotors. <span class="redact" data-order="1">It was the plugboard — wired fresh every day.</span> <span class="redact" data-order="2">Codebreakers found the pattern in how pairs were chosen, not the pairs themselves.</span> <span class="redact" data-order="3">A cipher isn't unbreakable. It's just unread by the wrong person.</span>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHAT IS TODAY'S ENIGMA? (observe — decrypt bridge) ================= -->
+<section id="today" data-milestone="today" class="relative py-24 sm:py-32 px-6 border-t border-white/5">
+  <div class="max-w-3xl mx-auto text-center">
+    <p class="eyebrow reveal">WHAT IS TODAY'S ENIGMA?</p>
+    <p id="bridge-line" class="bridge-line reveal reveal-delay-1 font-display font-semibold text-[clamp(1.3rem,3.2vw,2rem)] leading-snug mt-8 min-h-[4.5em] sm:min-h-[3em]" style="color:#E7E3D8;">
+      WAITING FOR SIGNAL…
+    </p>
+  </div>
+</section>
+
+<!-- ================= MISSION BRIEFING (observe — rotor cross-section instead of a third paragraph) ================= -->
+<section id="briefing" data-milestone="briefing" class="relative py-24 sm:py-32 px-6 border-t border-white/5 overflow-hidden">
+  <div class="max-w-3xl mx-auto text-center">
+    <p class="eyebrow reveal">MISSION BRIEFING</p>
+    <p class="reveal reveal-delay-1 font-display font-semibold text-[clamp(1.4rem,3.4vw,2.1rem)] leading-snug mt-8" style="color:#E7E3D8;">
+      Every generation inherits a board that looks unwired — until someone sits down and starts connecting pairs.
+    </p>
+
+    <div class="reveal reveal-delay-2 flex justify-center my-10">
+      <svg width="260" height="120" viewBox="0 0 260 120" aria-hidden="true">
+        <text x="10" y="18" class="sketch-label">ROTOR ASSEMBLY — CROSS SECTION</text>
+        <circle cx="60" cy="65" r="34" class="sketch-line diagram-draw" id="rotor-1"/>
+        <circle cx="130" cy="65" r="34" class="sketch-line diagram-draw" id="rotor-2"/>
+        <circle cx="200" cy="65" r="34" class="sketch-line diagram-draw" id="rotor-3"/>
+        <circle cx="60" cy="65" r="4" fill="rgba(184,137,76,0.5)"/>
+        <circle cx="130" cy="65" r="4" fill="rgba(184,137,76,0.5)"/>
+        <circle cx="200" cy="65" r="4" fill="rgba(184,137,76,0.5)"/>
+        <text x="10" y="112" class="sketch-label">FINANCE · HEALTHCARE — TWO TRACKS, ONE MACHINE</text>
+      </svg>
+    </div>
+
+    <p class="reveal reveal-delay-3 text-mute leading-relaxed mt-4 text-base sm:text-lg">
+      Not solved by force — solved by finding which two things, wired together, change everything downstream.
+    </p>
+  </div>
+</section>
+
+<!-- ================= CHOOSE A DOSSIER (interact — signature plugboard use #1) ================= -->
+<section id="dossiers" data-milestone="dossier" class="relative py-24 sm:py-32 px-6 border-t border-white/5">
+  <div class="max-w-6xl mx-auto">
+    <div class="text-center mb-4">
+      <p class="eyebrow reveal">CHOOSE A DOSSIER</p>
+      <h2 class="reveal reveal-delay-1 font-display font-semibold text-[clamp(1.8rem,4vw,2.8rem)] mt-4" style="color:#E7E3D8;">Two circuits. Wire one to open it.</h2>
+      <p class="reveal reveal-delay-2 text-mute mt-4 max-w-md mx-auto text-sm">Find the pair on the board below, or tap it here — either wire closes the same circuit.</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mt-12">
+      <!-- Dossier: Finance -->
+      <div class="case-file text-left p-7 sm:p-9 reveal" data-case data-pair="F,N">
+        <button type="button" class="case-toggle w-full text-left" data-case-toggle>
+          <div class="flex items-center justify-between pr-2">
+            <span class="pair-badge" data-pair-badge>F ↔ N <span data-pair-state>· unwired</span></span>
+            <svg class="case-chevron text-mute" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="font-display font-semibold text-2xl sm:text-3xl mt-5" style="color:#E7E3D8;">Decode Finance</h3>
+          <p class="text-mute text-sm mt-3">Markets, lending, fraud, and the infrastructure underneath.</p>
+        </button>
+        <div class="case-file-body mt-2">
+          <div>
+            <p class="text-mute text-sm leading-relaxed pt-4 border-t border-white/10 mt-5">
+              Build for lending, fraud detection, personal finance, or the infrastructure quietly running underneath all three.
+            </p>
+            <button type="button" class="pair-badge mt-5" data-wire-pair="F,N">Wire F ↔ N →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dossier: Health -->
+      <div class="case-file text-left p-7 sm:p-9 reveal reveal-delay-1" data-case data-pair="H,C">
+        <button type="button" class="case-toggle w-full text-left" data-case-toggle>
+          <div class="flex items-center justify-between pr-2">
+            <span class="pair-badge" data-pair-badge>H ↔ C <span data-pair-state>· unwired</span></span>
+            <svg class="case-chevron text-mute" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+          </div>
+          <h3 class="font-display font-semibold text-2xl sm:text-3xl mt-5" style="color:#E7E3D8;">Reimagine Healthcare</h3>
+          <p class="text-mute text-sm mt-3">Diagnosis, access, and care that arrives on time.</p>
+        </button>
+        <div class="case-file-body mt-2">
+          <div>
+            <p class="text-mute text-sm leading-relaxed pt-4 border-t border-white/10 mt-5">
+              Diagnosis, access, and care coordination fail in the same place: information arrives too late. Build tools that move it faster.
+            </p>
+            <button type="button" class="pair-badge mt-5" data-wire-pair="H,C">Wire H ↔ C →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p id="both-chosen-line" class="hidden-line text-center font-mono text-xs tracking-[0.15em] text-phosphor" style="color:#8FD14F;">
+      Both circuits live. Something else on the board just woke up — look for the pair that's glowing.
+    </p>
+  </div>
+</section>
+
+<!-- ================= MISSION LOG (observe — timeline) ================= -->
+<section id="log" data-milestone="log" class="relative py-28 sm:py-36 px-6 border-t border-white/5">
+  <div class="max-w-3xl mx-auto">
+    <div class="mb-16 text-center">
+      <p class="eyebrow reveal">MISSION LOG</p>
+      <h2 class="reveal reveal-delay-1 font-display font-semibold text-[clamp(1.8rem,4vw,2.6rem)] mt-4" style="color:#E7E3D8;">Every entry, in order.</h2>
+    </div>
+
+    <div class="relative pl-10">
+      <div class="log-line"></div>
+
+      <div class="log-entry reveal relative pb-14">
+        <span class="log-dot absolute -left-10 top-1"></span>
+        <p class="font-mono text-brass text-xs tracking-[0.2em]">LOG 01 · REGISTRATION OPENS</p>
+        <p class="font-display font-medium text-lg mt-2" style="color:#E7E3D8;">Teams of up to four submit their entry.</p>
+        <p class="text-mute text-sm mt-1">Open until seats run out.</p>
+      </div>
+
+      <div class="log-entry reveal reveal-delay-1 relative pb-14">
+        <span class="log-dot absolute -left-10 top-1"></span>
+        <p class="font-mono text-brass text-xs tracking-[0.2em]">LOG 02 · DAY 1, 09:00 — KICKOFF</p>
+        <p class="font-display font-medium text-lg mt-2" style="color:#E7E3D8;">Dossiers open. The clock starts.</p>
+        <p class="text-mute text-sm mt-1">Briefings, mentors, first line of code.</p>
+      </div>
+
+      <div class="log-entry reveal reveal-delay-2 relative pb-14">
+        <span class="log-dot absolute -left-10 top-1"></span>
+        <p class="font-mono text-brass text-xs tracking-[0.2em]">LOG 03 · DAY 2, 18:00 — SUBMISSION</p>
+        <p class="font-display font-medium text-lg mt-2" style="color:#E7E3D8;">Builds are locked and transmitted.</p>
+        <p class="text-mute text-sm mt-1">Repositories close. What's built is judged.</p>
+      </div>
+
+      <div class="log-entry reveal reveal-delay-3 relative pb-14">
+        <span class="log-dot absolute -left-10 top-1"></span>
+        <p class="font-mono text-brass text-xs tracking-[0.2em]">LOG 04 · DAY 2, 20:00 — JUDGING</p>
+        <p class="font-display font-medium text-lg mt-2" style="color:#E7E3D8;">Every dossier is cross-examined.</p>
+        <p class="text-mute text-sm mt-1">Teams present. Judges break the cipher.</p>
+      </div>
+
+      <div class="log-entry reveal reveal-delay-4 relative">
+        <span class="log-dot absolute -left-10 top-1"></span>
+        <p class="font-mono text-brass text-xs tracking-[0.2em]">LOG 05 · DAY 2, 22:00 — RESULTS</p>
+        <p class="font-display font-medium text-lg mt-2" style="color:#E7E3D8;">Clearance is granted.</p>
+        <p class="text-mute text-sm mt-1">Winners announced. Mission concludes — for this cycle.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= DECRYPT THE REWARD (observe) ================= -->
+<section id="reward" data-milestone="reward" class="relative py-28 sm:py-40 px-6 border-t border-white/5 overflow-hidden">
+  <div class="blueprint opacity-70"></div>
+  <div class="relative max-w-3xl mx-auto text-center">
+    <p class="eyebrow reveal">DECRYPT THE REWARD</p>
+    <p class="reveal reveal-delay-1 font-display text-lg sm:text-xl mt-6" style="color:#E7E3D8;">One breakthrough.</p>
+    <div class="reveal reveal-delay-2 font-display font-bold text-brass mt-3 text-[clamp(3rem,11vw,6.5rem)] leading-none" id="prize-amount" data-final="₹25,000">
+      ₹00,000
+    </div>
+    <p class="reveal reveal-delay-3 font-mono text-mute text-xs tracking-[0.3em] mt-4">PRIZE POOL</p>
+  </div>
+</section>
+
+<!-- ================= FILE 00 (hidden — discovered, not hinted) ================= -->
+<section id="file00" class="hidden-line relative py-16 px-6 border-t border-white/5" data-hidden-section>
+  <div class="max-w-2xl mx-auto text-center">
+    <p class="eyebrow" style="color:#8FD14F;">FILE 00 · UNLISTED</p>
+    <p class="font-display font-semibold text-xl sm:text-2xl mt-4" style="color:#E7E3D8;">
+      Most visitors never find this pair.
+    </p>
+  </div>
+</section>
+
+<!-- ================= ACCEPT THE MISSION (observe) ================= -->
+<section id="register" class="relative py-28 sm:py-40 px-6 border-t border-white/5 overflow-hidden">
+  <div class="blueprint"></div>
+  <div class="relative max-w-2xl mx-auto text-center">
+    <p class="eyebrow reveal">ACCEPT THE MISSION</p>
+    <h2 class="reveal reveal-delay-1 font-display font-bold text-[clamp(1.9rem,5vw,3.2rem)] mt-5 leading-tight" style="color:#E7E3D8;">Your invitation has arrived.</h2>
+    <p class="reveal reveal-delay-2 text-mute mt-6 text-base sm:text-lg leading-relaxed">
+      Not everyone receives this. Register your team and accept the mission.
+    </p>
+    <button data-open-drawer class="reveal reveal-delay-3 btn-primary px-9 py-4 rounded-lg text-sm mt-9">Accept the Mission</button>
+  </div>
+</section>
+
+<!-- ================= CONTACT ================= -->
+<section id="contact" class="relative py-24 sm:py-32 px-6 border-t border-white/5">
+  <div class="max-w-4xl mx-auto grid sm:grid-cols-3 gap-8 text-center sm:text-left">
+    <div class="reveal">
+      <p class="eyebrow">Open Channel</p>
+      <h3 class="font-display text-xl mt-4" style="color:#E7E3D8;">Questions before you commit?</h3>
+    </div>
+    <div class="reveal reveal-delay-1">
+      <p class="font-mono text-mute text-xs tracking-[0.2em]">EMAIL</p>
+      <a href="mailto:enigma@siescsi.edu" class="hover:text-brass transition-colors duration-200 mt-2 inline-block" style="color:#E7E3D8;">enigma@siescsi.edu</a>
+    </div>
+    <div class="reveal reveal-delay-2">
+      <p class="font-mono text-mute text-xs tracking-[0.2em]">CHANNELS</p>
+      <div class="flex sm:justify-start justify-center gap-5 mt-2">
+        <a href="#" class="text-mute hover:text-brass transition-colors duration-200 text-sm">Instagram</a>
+        <a href="#" class="text-mute hover:text-brass transition-colors duration-200 text-sm">LinkedIn</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ================= TRANSMISSION ENDS (footer) ================= -->
+<footer class="relative border-t border-white/10 px-6 py-12 pb-32">
+  <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+    <div class="flex items-center gap-3">
+      <div class="flex items-end gap-[3px] h-4" id="footer-bars">
+        <span class="bar live w-[3px] h-2 rounded-sm"></span>
+        <span class="bar live w-[3px] h-3 rounded-sm" style="animation-delay:.2s"></span>
+        <span class="bar live w-[3px] h-4 rounded-sm" style="animation-delay:.4s"></span>
+        <span class="bar live w-[3px] h-2.5 rounded-sm" style="animation-delay:.6s"></span>
+      </div>
+      <span class="font-mono text-[11px] tracking-[0.2em] text-mute" id="footer-label">TRANSMISSION ACTIVE</span>
+    </div>
+    <p class="font-mono text-[11px] tracking-[0.15em] text-mute">© 2026 ENIGMA 5.0 · SIES CSI</p>
+  </div>
+</footer>
+
+<!-- ================= THE PLUGBOARD (persistent console) ================= -->
+<div id="console-wrap">
+  <div id="console">
+    <div id="console-readout">CONNECT TO THE STATION TO WAKE THE BOARD</div>
+    <div id="console-board-scroll">
+      <div id="console-board">
+        <svg id="cable-svg"></svg>
+        <div class="jack-row" id="jack-row-1"></div>
+        <div class="jack-row" id="jack-row-2"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= REGISTRATION DRAWER (interact — signature plugboard use #2) ================= -->
+<div id="overlay" data-close-drawer></div>
+<aside id="drawer" aria-hidden="true" aria-label="Registration">
+  <div class="flex items-center justify-between px-7 pt-7">
+    <span class="font-mono text-[11px] tracking-[0.25em] text-brass">ACCESS REQUEST</span>
+    <button data-close-drawer aria-label="Close" class="text-mute hover:text-brass transition-colors duration-200 p-1">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M2 2l14 14M16 2L2 16" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+
+  <div class="px-7 pt-8">
+    <h2 class="font-display font-semibold text-2xl tracking-wide" style="color:#E7E3D8;">Wire A ↔ R to request access.</h2>
+    <p id="drawer-sub" class="text-mute text-sm mt-2">The form stays dead until the circuit closes.</p>
+  </div>
+
+  <div class="px-7 mt-6">
+    <div class="mini-jacks" id="drawer-jacks" style="gap:14px;">
+      <svg id="drawer-cable-svg" viewBox="0 0 160 50" preserveAspectRatio="none" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; overflow:visible;"><path id="drawer-cable-path" d="" stroke="#8FD14F" stroke-width="2" fill="none" stroke-linecap="round" opacity="0"/></svg>
+      <button type="button" class="mini-jack" style="width:46px;height:46px;font-size:1.1rem;" data-mini-letter="A" aria-label="Jack A">A</button>
+      <button type="button" class="mini-jack" style="width:46px;height:46px;font-size:1.1rem;" data-mini-letter="R" aria-label="Jack R">R</button>
+    </div>
+  </div>
+
+  <div class="px-7 mt-7 flex flex-col gap-1.5">
+    <div class="checklist-item" data-check="received"><span class="dot"></span> TRANSMISSION RECEIVED</div>
+    <div class="checklist-item" data-check="wired"><span class="dot"></span> A ↔ R CIRCUIT CLOSED</div>
+    <div class="checklist-item" data-check="cleared"><span class="dot"></span> CLEARANCE GRANTED</div>
+  </div>
+
+  <form id="reg-form" class="px-7 mt-6 flex-1 flex flex-col gap-4 overflow-y-auto pb-7">
+    <div>
+      <label class="font-mono text-[11px] tracking-[0.15em] text-mute" for="f-name">FULL NAME</label>
+      <input disabled required id="f-name" name="name" type="text" placeholder="Agent name" class="field locked w-full mt-1.5 px-4 py-3 rounded-lg text-sm" />
+    </div>
+    <div>
+      <label class="font-mono text-[11px] tracking-[0.15em] text-mute" for="f-email">EMAIL</label>
+      <input disabled required id="f-email" name="email" type="email" placeholder="you@domain.com" class="field locked w-full mt-1.5 px-4 py-3 rounded-lg text-sm" />
+    </div>
+    <div>
+      <label class="font-mono text-[11px] tracking-[0.15em] text-mute" for="f-phone">PHONE</label>
+      <input disabled required id="f-phone" name="phone" type="tel" placeholder="+91 00000 00000" class="field locked w-full mt-1.5 px-4 py-3 rounded-lg text-sm" />
+    </div>
+    <div>
+      <label class="font-mono text-[11px] tracking-[0.15em] text-mute" for="f-team">TEAM NAME</label>
+      <input disabled required id="f-team" name="team" type="text" placeholder="Codename" class="field locked w-full mt-1.5 px-4 py-3 rounded-lg text-sm" />
+    </div>
+    <div>
+      <label class="font-mono text-[11px] tracking-[0.15em] text-mute" for="f-members">TEAM MEMBERS</label>
+      <textarea disabled id="f-members" name="members" rows="2" placeholder="One name per line (up to 4)" class="field locked w-full mt-1.5 px-4 py-3 rounded-lg text-sm resize-none"></textarea>
+    </div>
+
+    <button disabled type="submit" id="submit-btn" class="btn-primary w-full py-3.5 rounded-lg text-sm mt-2">Transmit</button>
+  </form>
+
+  <div id="success" class="hidden flex-1 flex-col items-center justify-center px-7 text-center">
+    <div class="stamp border-2 border-oxide font-display font-bold text-xl px-5 py-2.5 rounded" style="letter-spacing:0.08em; transform: rotate(-8deg); color:#C24A3A; border-color:#C24A3A;">CLEARANCE GRANTED</div>
+    <p class="font-display text-lg mt-6" style="color:#E7E3D8;">Welcome to Enigma 5.0.</p>
+    <p class="text-mute text-sm mt-2" id="success-sub">A confirmation will reach you on the channel provided.</p>
+  </div>
+</aside>
+
+</body>
+</html>
